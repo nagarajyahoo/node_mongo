@@ -6,10 +6,18 @@ var user = {
     location: "Bangalore"
 };
 
-repository.save(user, (saved) => {
-    console.log("Saved user ===> ", JSON.stringify(saved, undefined, 2));
-    console.log("printing timestamp from ID ===> ", saved[0]._id.getTimestamp());
+// repository.save(user, (saved) => {
+//     console.log("Saved user ===> ", JSON.stringify(saved, undefined, 2));
+//     console.log("printing timestamp from ID ===> ", saved[0]._id.getTimestamp());
+// });
+
+repository.getAll((users) => {
+    console.log(JSON.stringify(users, undefined, 2));
 });
+
+// repository.byOID("5b0f167567a5e8045c6a35fa", (user) => {
+//     console.log(JSON.stringify(user, undefined, 2));
+// });
 
 
 
