@@ -80,11 +80,39 @@ var getUserByOID = (oid, callback) => {
     });
 };
 
+var deleteUserByOID = (oid, callback) => {
+    MongoClient.connect(url, (err, client) => {
+        try {
+            if (err) {
+                return console.log("Unable to connect to mongo db");
+            }
+            else {
+                const db = client.db(users_database);
+                db.collection(users_collection).remove({
+                    _id: new ObjectID(oid)
+                }, (err, result) => {
+                    if (err) {
+                        return console.log("Unable insert record", err);
+                    }
+                    else {
+                        callback(result.ops);
+                    }
+                });
+            }
+        }
+        finally {
+            console.log("Closing connection ...");
+            client.close();
+        }
+    })
+};
+
 
 module.exports = {
     save: saveRecord,
     getAll: allUsers,
-    byOID: getUserByOID
+    getByOID: getUserByOID,
+    deleteByOID: deleteUserByOID
 };
 
 
