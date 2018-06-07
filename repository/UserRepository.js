@@ -88,14 +88,14 @@ var deleteUserByOID = (oid, callback) => {
             }
             else {
                 const db = client.db(users_database);
-                db.collection(users_collection).remove({
+                db.collection(users_collection).deleteOne({
                     _id: new ObjectID(oid)
                 }, (err, result) => {
                     if (err) {
                         return console.log("Unable insert record", err);
                     }
                     else {
-                        callback(result.ops);
+                        callback(result);
                     }
                 });
             }
@@ -107,6 +107,29 @@ var deleteUserByOID = (oid, callback) => {
     })
 };
 
+var test = (callback) => {
+    MongoClient.connect(url, (err, client) => {
+        try {
+            if (err) {
+                return console.log("Unable to connect to mongo db");
+            }
+            else {
+                const db = client.db(users_database);
+                db.collection(users_collection)
+                    .deleteOne({name : 'Nagaraj M R'})
+                    .then((result) => {
+                        console.log(result.result);
+                    })
+            }
+        }
+        finally {
+            console.log("Closing connection ...");
+            client.close();
+        }
+    })
+};
+
+test();
 
 module.exports = {
     save: saveRecord,
