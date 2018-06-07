@@ -184,7 +184,40 @@ var updateName = (oid, newName, callback) => {
     })
 };
 
-updateName('5b0f15ed71c1310454756fb6', 'old name not back');
+var incrementAge = (oid, callback) => {
+    MongoClient.connect(url, (err, client) => {
+        try {
+            if (err) {
+                return console.log("Unable to connect to mongo db");
+            }
+            else {
+                const db = client.db(users_database);
+                db.collection(users_collection)
+                    .findOneAndUpdate(
+                        {
+                            _id: new ObjectID(oid)
+                        },
+                        {
+                            $inc : {
+                                age : 2
+                            }
+                        },
+                        {
+                            returnOriginal : false
+                        })
+                    .then((result) => {
+                        console.log(JSON.stringify(result, undefined, 2));
+                    })
+            }
+        }
+        finally {
+            console.log("Closing connection ...");
+            client.close();
+        }
+    })
+};
+
+incrementAge('5b0f15ed71c1310454756fb6');
 
 module.exports = {
     save: saveRecord,
