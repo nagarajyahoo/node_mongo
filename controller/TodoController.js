@@ -20,6 +20,24 @@ app.post('/todos', (req, res) => {
     });
 });
 
+app.get('/todos', (req, res) => {
+    var errorResponse = {
+        "err" : "Error occurred"
+    };
+
+    Todo.find({}).then(
+        (results) => {
+            res.status(200).send({
+                "values" : results,
+                "count" : results.length
+            });
+        },
+        (error) => {
+            res.status(500).send(error)
+        }
+    )
+});
+
 app.listen(port, () => {
     console.log(`Started listening on ${port}`)
 });
