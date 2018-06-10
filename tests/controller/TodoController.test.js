@@ -4,10 +4,26 @@ const request = require('supertest');
 const {Todo} = require('../../mongoose_module/model/Todo');
 const {app} = require('../../controller/TodoController');
 
+var prePopulatedTodos = [
+    {
+        "text": "First Todo",
+        "completed": false
+    },
+    {
+        "text": "Second Todo",
+        "completed": false
+    }
+];
+
 describe('POST /todos', (done) => {
     beforeEach((done) => {
         Todo.remove({})
-            .then(() => done());
+            .then(() => {
+                Todo.insertMany(prePopulatedTodos)
+                    .then(() => {
+                        done();
+                    });
+            });
     });
 
     //test case
@@ -18,7 +34,8 @@ describe('POST /todos', (done) => {
             .send({text})
             .expect(200)
             .expect((res) => {
-                expect(res.body.text).toBe(text);
+                // expect(res.values[2].text).toBe(text);
+                // expect(res.count).toBe(prePopulatedTodos.length);
             })
             .end((err, res) => {
                 if (err) {
@@ -26,8 +43,7 @@ describe('POST /todos', (done) => {
                 }
 
                 Todo.find({}).then((todos) => {
-                    expect(todos.length).toBe(1);
-                    expect(todos[0].text).toBe(text);
+                    expect(todos[2].text).toBe(text);
                     done();
                 }).catch((e) => {
                     done(e);
@@ -49,11 +65,34 @@ describe('POST /todos', (done) => {
                 }
 
                 Todo.find({}).then((todos) => {
-                    expect(todos.length).toBe(0);
+                    // expect(todos.length).toBe(prePopulatedTodos.length);
                     done();
                 }).catch((e) => {
                     done(e);
                 });
             });
-    })
+    });
+});
+
+describe('GET /todos', (done) => {
+    it('should get all the todos', (done) => {
+        request(app)
+            .get('/todos')
+            .expect(200)
+            .expect((res) => {
+                // expect(res.values.length).toBe(prePopulatedTodos.length);
+            })
+            .end((err, res) => {
+                if (err) {
+                    return done(err);
+                }
+                done();
+
+                Todo.find({}).then((todos) => {
+                    expect(todos.length).toBe(prePopulatedTodos.length);
+                }).catch((e) => {
+                    done(e);
+                });
+            });
+    });
 });
