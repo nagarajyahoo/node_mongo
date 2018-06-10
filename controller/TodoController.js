@@ -12,10 +12,10 @@ app.use(bodyParser.json());
 app.post('/todos', (req, res) => {
     var todo = new Todo(req.body);
     todo.save().then((result) => {
-        return res.send(result);
+        return res.status(200).send(result);
     }, (err) => {
-        return res.send(500, {
-            "err": "Failed to save todo"
+        return res.status(400).send({
+            "err": "Check input values"
         });
     });
 });
