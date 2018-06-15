@@ -96,3 +96,53 @@ describe('GET /todos', (done) => {
             });
     });
 });
+
+describe('GET /todos/{id}', () => {
+    it('Should return todo detail of give ID', (done) => {
+        var todo = new Todo({
+            "text": "some text for testing",
+            "completed": false
+        });
+
+        todo.save()
+            .then((result) => {
+                var id = result._id;
+
+                request(app)
+                    .get('/todos/' + id)
+                    .expect(200)
+                    .expect((res) => {
+                        console.log(res.body);
+                        expect(JSON.stringify(res.body)).toBe(JSON.stringify(result));
+                    })
+                    .end((err, res) => {
+                        if (err) {
+                            return done(err);
+                        }
+                        return done();
+                    });
+            })
+            .catch((ex) => {
+                console.log("error", ex);
+                done(ex);
+            });
+    });
+
+    it('Should return error for invalid ID', (done) => {
+        var expected = {"message":"incorrect todo ID"};
+       request(app)
+           .get('/todos/234234')
+           .expect(400)
+           .expect((res) => {
+               expect(JSON.stringify(res.body)).toBe(JSON.stringify(expected));
+           })
+           .end((err, res) => {
+               if(err) {
+                   return done(err);
+               }
+               else {
+                   done();
+               }
+           })
+    });
+});
