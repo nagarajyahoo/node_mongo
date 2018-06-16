@@ -21,7 +21,7 @@ describe('POST /todos', (done) => {
             .then(() => {
                 Todo.insertMany(prePopulatedTodos)
                     .then((result) => {
-                        console.log("inserted many values", result);
+                        // console.log("inserted many values", result);
                     })
                     .catch((ex) => {
                         return done(ex);
@@ -111,7 +111,7 @@ describe('GET /todos/{id}', () => {
                     .get('/todos/' + id)
                     .expect(200)
                     .expect((res) => {
-                        console.log(res.body);
+                        // console.log(res.body);
                         expect(JSON.stringify(res.body)).toBe(JSON.stringify(result));
                     })
                     .end((err, res) => {
@@ -194,75 +194,75 @@ describe('DELETE /todo/{id}', () => {
                 return done(ex);
             });
     });
+});
 
-    describe('PUT /todos/{id}', () => {
-        it('Should update the todo', (done) => {
-            var todo = new Todo({
-                "text": "dummy text",
-                "completed": false
+describe('PUT /todos/{id}', () => {
+    it('Should update the todo', (done) => {
+        var todo = new Todo({
+            "text": "dummy text",
+            "completed": false
+        });
+
+        todo.save()
+            .then((savedTodo) => {
+                var todoId = savedTodo._id;
+
+                var todoToUpdate = {
+                    "text": "dummy text updated",
+                    "completed": true
+                };
+
+                request(app)
+                    .put(`/todos/${todoId}`)
+                    .send(todoToUpdate)
+                    .expect(200)
+                    .expect((res) => {
+                        // console.log(res.body);
+                        expect(res.body.completed).toBe(true);
+                        expect(res.body.text).toBe("dummy text updated");
+                    })
+                    .end((err, res) => {
+                        if (err) {
+                            return done(err);
+                        }
+                        return done();
+                    })
+            })
+            .catch((ex) => {
+                return done(ex);
             });
+    });
 
-            todo.save()
-                .then((savedTodo) => {
-                    var todoId = savedTodo._id;
+    it('Should send 404 for unknown todo ID', (done) => {
+        var todoID = "5b251f5a84a40505ecd2a2a4";
+        Todo.findByIdAndRemove(todoID)
+            .then((result) => {
+                request(app)
+                    .put('/todos/' + todoID)
+                    .expect(404)
+                    .end((err, res) => {
+                        if (err) {
+                            return done(err);
+                        }
+                        return done();
+                    });
+            })
+            .catch((ex) => {
+                return done(ex);
+            });
+    });
 
-                    var todoToUpdate = {
-                        "text": "dummy text updated",
-                        "completed": true
-                    };
+    it('Should send 400 for invalid todo ID', (done) => {
+        var todoID = "123";
 
-                    request(app)
-                        .put(`/todos/${todoId}`)
-                        .send(todoToUpdate)
-                        .expect(200)
-                        .expect((res) => {
-                            console.log(res.body);
-                            expect(res.body.completed).toBe(true);
-                            expect(res.body.text).toBe("dummy text updated");
-                        })
-                        .end((err, res) => {
-                            if (err) {
-                                return done(err);
-                            }
-                            return done();
-                        })
-                })
-                .catch((ex) => {
-                    return done(ex);
-                });
-        });
-
-        it('Should send 404 for unknown todo ID', (done) => {
-            var todoID = "5b251f5a84a40505ecd2a2a4";
-            Todo.findByIdAndRemove(todoID)
-                .then((result) => {
-                    request(app)
-                        .put('/todos/' + todoID)
-                        .expect(404)
-                        .end((err, res) => {
-                            if (err) {
-                                return done(err);
-                            }
-                            return done();
-                        });
-                })
-                .catch((ex) => {
-                    return done(ex);
-                });
-        });
-
-        it('Should send 400 for invalid todo ID', (done) => {
-            var todoID = "123";
-
-            request(app)
-                .put('/todos/' + todoID)
-                .expect(400)
-                .end((err, res) => {
-                    if (err) {
-                        return done(err);
-                    }
-                    return done();
-                });
-        });
+        request(app)
+            .put('/todos/' + todoID)
+            .expect(400)
+            .end((err, res) => {
+                if (err) {
+                    return done(err);
+                }
+                return done();
+            });
     });
 });

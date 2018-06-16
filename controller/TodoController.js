@@ -1,3 +1,17 @@
+var env = process.env.NODE_ENV || 'development';
+console.log("Current environment is " + env);
+
+if(env === 'development') {
+    const database = "todos";
+    process.env.PORT = 3000;
+    process.env.MONGODB_URI = "mongodb://localhost:27017/" + database;
+}
+else if (env === 'test') {
+    const database = "test_todos";
+    process.env.PORT = 3000;
+    process.env.MONGODB_URI = "mongodb://localhost:27017/" + database;
+}
+
 const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -7,7 +21,7 @@ var {mongoose} = require('../mongoose_module/mongoose/MongooseDB.js');
 var {ObjectID} = require('mongodb');
 
 var app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 app.use(bodyParser.json());
 
