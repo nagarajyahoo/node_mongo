@@ -6,7 +6,7 @@ var {mongoose} = require('../mongoose_module/mongoose/MongooseDB.js');
 var {ObjectID} = require('mongodb');
 
 var app = express();
-const port = 3000;
+const port = process.ENV.port || 3000;
 
 app.use(bodyParser.json());
 
