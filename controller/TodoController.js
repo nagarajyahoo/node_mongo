@@ -44,7 +44,7 @@ app.get('/todos/:todoId', (req, res) => {
     if (ObjectID.isValid(todoId)) {
         Todo.findById(todoId)
             .then((todo) => {
-                if(todo) {
+                if (todo) {
                     return res.status(200).send(todo);
                 }
                 else {
@@ -60,6 +60,38 @@ app.get('/todos/:todoId', (req, res) => {
     else {
         return res.status(400).send({
             "message": "incorrect todo ID"
+        });
+    }
+});
+
+app.delete('/todos/:id', (req, res) => {
+    var todoId = req.params.id;
+    if (ObjectID.isValid(todoId)) {
+        Todo.findByIdAndRemove(todoId)
+            .then((deletedTodo) => {
+                if(deletedTodo) {
+                    return res.status(200).send(deletedTodo);
+                }
+                else {
+                    return res.status(404).send({
+                        "type": "error_response",
+                        "message": "todo not found"
+                    });
+                }
+            })
+            .catch((ex) => {
+                console.log("Unexpected while removing todo", ex);
+
+                return res.status(400).send({
+                    "type": "error_response",
+                    "message": "Error while removing todo"
+                });
+            });
+    }
+    else {
+        return res.status(400).send({
+            "type": "error_response",
+            "message": "invalid todo ID"
         });
     }
 });
