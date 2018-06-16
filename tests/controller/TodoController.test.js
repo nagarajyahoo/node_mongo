@@ -24,7 +24,7 @@ describe('POST /todos', (done) => {
                         console.log("inserted many values", result);
                     })
                     .catch((ex) => {
-                        return  done(ex);
+                        return done(ex);
                     });
                 return done();
             });
@@ -128,20 +128,70 @@ describe('GET /todos/{id}', () => {
     });
 
     it('Should return error for invalid ID', (done) => {
-        var expected = {"message":"incorrect todo ID"};
-       request(app)
-           .get('/todos/234234')
-           .expect(400)
-           .expect((res) => {
-               expect(JSON.stringify(res.body)).toBe(JSON.stringify(expected));
-           })
-           .end((err, res) => {
-               if(err) {
-                   return done(err);
-               }
-               else {
-                   done();
-               }
-           })
+        var expected = {"message": "incorrect todo ID"};
+        request(app)
+            .get('/todos/234234')
+            .expect(400)
+            .expect((res) => {
+                expect(JSON.stringify(res.body)).toBe(JSON.stringify(expected));
+            })
+            .end((err, res) => {
+                if (err) {
+                    return done(err);
+                }
+                else {
+                    done();
+                }
+            })
+    });
+});
+
+
+describe('DELETE /todo/{id}', () => {
+    it('Should delete the todo by given ID', (done) => {
+        var todo = new Todo({
+            "text": "some text for testing",
+            "completed": false
+        });
+
+        todo.save()
+            .then((result) => {
+                var id = result._id;
+
+                request(app)
+                    .del('/todos/' + id)
+                    .expect(200)
+                    .expect((res) => {
+                        expect(JSON.stringify(res.body)).toBe(JSON.stringify(result));
+                    })
+                    .end((err, res) => {
+                        if (err) {
+                            return done(err);
+                        }
+                        return done();
+                    })
+            })
+            .catch((ex) => {
+                return done(ex);
+            });
+    });
+
+    it('Should give 404 if not found with valid ID format', (done) => {
+        var todoID = "5b251f5a84a40505ecd2a2a4";
+        Todo.findByIdAndRemove(todoID)
+            .then((result) => {
+                request(app)
+                    .del('/todos/' + todoID)
+                    .expect(404)
+                    .end((err, res) => {
+                        if (err) {
+                            return done(err);
+                        }
+                        return done();
+                    });
+            })
+            .catch((ex) => {
+                return done(ex);
+            });
     });
 });
