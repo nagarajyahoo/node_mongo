@@ -1,22 +1,10 @@
-//configuring environment
-require('../config/config');
-
 const _ = require('lodash');
-const express = require('express');
-const bodyParser = require('body-parser');
+
 var {Todo} = require('../mongoose_module/model/Todo.js');
-var {User} = require('../mongoose_module/model/User.js');
 var {mongoose} = require('../mongoose_module/mongoose/MongooseDB.js');
 var {ObjectID} = require('mongodb');
-
-var app = express();
-const port = process.env.PORT;
-
-app.use(bodyParser.json());
-
-var errorResponse = {
-    "type": "error_response"
-};
+var {app} = require('../server');
+var {errorResponse} = require('../server');
 
 app.post('/todos', (req, res) => {
     var todo = new Todo(req.body);
@@ -135,11 +123,3 @@ app.put('/todos/:id', (req, res) => {
         return res.status(400).send(errorResponse);
     }
 });
-
-app.listen(port, () => {
-    console.log(`Started listening on ${port}`)
-});
-
-module.exports = {
-    app: app
-};

@@ -2,7 +2,7 @@ const expect = require('expect');
 const request = require('supertest');
 
 const {Todo} = require('../../mongoose_module/model/Todo');
-const {app} = require('../../controller/TodoController');
+const {app} = require('../../server');
 
 var prePopulatedTodos = [
     {
