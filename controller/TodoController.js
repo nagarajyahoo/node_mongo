@@ -1,16 +1,5 @@
-var env = process.env.NODE_ENV || 'development';
-console.log("Current environment is " + env);
-
-if(env === 'development') {
-    const database = "todos";
-    process.env.PORT = 3000;
-    process.env.MONGODB_URI = "mongodb://localhost:27017/" + database;
-}
-else if (env === 'test') {
-    const database = "test_todos";
-    process.env.PORT = 3000;
-    process.env.MONGODB_URI = "mongodb://localhost:27017/" + database;
-}
+//configuring environment
+require('../config/config');
 
 const _ = require('lodash');
 const express = require('express');
