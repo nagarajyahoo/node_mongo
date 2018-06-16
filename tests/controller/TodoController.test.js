@@ -20,9 +20,13 @@ describe('POST /todos', (done) => {
         Todo.remove({})
             .then(() => {
                 Todo.insertMany(prePopulatedTodos)
-                    .then(() => {
-                        done();
+                    .then((result) => {
+                        console.log("inserted many values", result);
+                    })
+                    .catch((ex) => {
+                        return  done(ex);
                     });
+                return done();
             });
     });
 
@@ -44,10 +48,11 @@ describe('POST /todos', (done) => {
 
                 Todo.find({}).then((todos) => {
                     expect(todos[2].text).toBe(text);
-                    done();
                 }).catch((e) => {
-                    done(e);
+                    return done(e);
                 });
+
+                return done();
             });
     });
 
@@ -57,20 +62,14 @@ describe('POST /todos', (done) => {
             .send({})
             .expect(400)
             .expect((res) => {
-                expect(res.body.err).toBe('Check input values')
+                expect(res.body.err).toBe('Check input values');
             })
             .end((err, res) => {
                 if (err) {
                     return done(err);
                 }
-
-                Todo.find({}).then((todos) => {
-                    // expect(todos.length).toBe(prePopulatedTodos.length);
-                    done();
-                }).catch((e) => {
-                    done(e);
-                });
             });
+        return done();
     });
 });
 
