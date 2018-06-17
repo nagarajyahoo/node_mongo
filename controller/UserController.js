@@ -4,6 +4,7 @@ var {User} = require('../mongoose_module/model/User.js');
 var {mongoose} = require('../mongoose_module/mongoose/MongooseDB.js');
 var {ObjectID} = require('mongodb');
 var {app} = require('../server');
+var {authenticate} = require('../security/Authenticate');
 
 app.post('/users', (req, res) => {
     var userDetails = _.pick(req.body, ['email', 'password']);
@@ -23,38 +24,6 @@ app.post('/users', (req, res) => {
             });
         });
 });
-
-var authenticate = (req, res, next) => {
-    try {
-        var token = req.header('x-auth');
-
-            User.getUser(token)
-                .then((user) => {
-                    if(user) {
-                        req.user = user;
-                        req.token = token;
-                        next();
-                    }
-                    else {
-                        return Promise.reject('user not found');
-                    }
-                })
-                .catch((ex) => {
-                    console.error("error occurred", ex);
-                    return res.status(401).send({
-                        "type": "error_response",
-                        "message": "un-authenticated"
-                    });
-                });
-    }
-    catch (ex) {
-        console.error("error occurred", ex);
-        return res.status(401).send({
-            "type": "error_response",
-            "message": "un-authenticated"
-        });
-    }
-};
 
 app.get('/users/me', authenticate, (req, res) => {
     return res.status(200).send(req.user);
