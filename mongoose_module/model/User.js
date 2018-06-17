@@ -3,6 +3,8 @@ const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 
+const SECRET = "secret123";
+
 var schema = new mongoose.Schema({
     email: {
         type: String,
@@ -36,6 +38,21 @@ var schema = new mongoose.Schema({
     ]
 });
 
+schema.statics.getUser = function (token) {
+    var User = this;
+    try {
+        const decoded = jwt.decode(token, SECRET);
+        return User.findOne({
+            '_id' : decoded._id,
+            'tokens.token' : token,
+            'tokens.access' : 'auth',
+        });
+    }
+    catch (ex) {
+        return Promise.reject(ex);
+    }
+};
+
 schema.methods.toJSON = function () {
     var user = this;
     var userObject = user.toObject();
@@ -45,7 +62,7 @@ schema.methods.toJSON = function () {
 schema.methods.generateAuth = function () {
     var user = this;
     var access = 'auth';
-    const token = jwt.sign({"_id": user._id.toHexString(), "access": access}, 'secret123').toString();
+    const token = jwt.sign({"_id": user._id.toHexString(), "access": access}, SECRET).toString();
     user.tokens = user.tokens.concat([{access, token}]);
 
     return user.save()
