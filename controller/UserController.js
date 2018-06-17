@@ -11,7 +11,7 @@ app.post('/users', (req, res) => {
 
     user.save()
         .then((savedUser) => {
-            return savedUser.generateAuth()
+            return savedUser.generateAuth();
         })
         .then((token) => {
             return res.header('x-auth', token).status(200).send(user);
